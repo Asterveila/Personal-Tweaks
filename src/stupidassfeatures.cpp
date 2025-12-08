@@ -19,6 +19,7 @@ $on_mod(Loaded){
     });
 }
 
+/*
 class $modify(StupidPlayerObject, PlayerObject) {
     struct Fields {
         CCSprite* p_soulSpr = nullptr;
@@ -100,6 +101,7 @@ class $modify(StupidPlayerObject, PlayerObject) {
         if (m_ghostTrail) m_ghostTrail->m_iconSprite = fields->p_soulSpr;
     }
 };
+*/
 
 class $modify(FuckYouMirrorPortal, GJBaseGameLayer) {
     void toggleFlipped(bool p0, bool p1) {
