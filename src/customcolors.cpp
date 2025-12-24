@@ -459,6 +459,25 @@ class $modify(ColorsGameManager, GameManager) {
             ret = colors.glow;
         }
 
+        bool isSeparateLoaded = Loader::get()->isModLoaded("weebify.separate_dual_icons");
+        auto SDL = Loader::get()->getLoadedMod("weebify.separate_dual_icons");
+
+        if (isSeparateLoaded) {
+            PlayerColors p2colors = settings.p2;
+
+            int p2c1 = SDL->getSavedValue<int>("color1");
+            int p2c2 = SDL->getSavedValue<int>("color2");
+            int p2glow = SDL->getSavedValue<int>("colorglow");
+
+            if (index == p2c1) {
+                ret = p2colors.primary;
+            } else if (index == p2c2) {
+                ret = p2colors.secondary;
+            } else if (index == p2glow) {
+                ret = p2colors.glow;
+            }
+        }
+
         return ret;
     }
 };

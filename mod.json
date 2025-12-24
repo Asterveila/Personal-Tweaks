@@ -763,8 +763,6 @@
 	"resources": {
 		"files": [
 			"resources/*.ogg",
-			"resources/fonts/*.png",
-			"resources/fonts/*.fnt",
 			"resources/animated/*.gif"
 		],
 		"fonts": {
@@ -780,9 +778,6 @@
 		"spritesheets": {
 			"TotemSheet": [
 				"resources/totemFrames/*.png"
-			],
-			"DeltaruneSheet": [
-				"resources/deltarune/*.png"
 			],
 			"PTUISheet": [
 				"resources/ModernSheet/*.png"
