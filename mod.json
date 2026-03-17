@@ -35,6 +35,12 @@
 			"name": "Settings not in 'mod menu' yet",
 			"description": "Self explanatory"
 		},
+		"timeleft": {
+			"type": "bool",
+			"name": "Show Time Left",
+			"description": "Enables the Time Left label in PlayLayer.",
+			"default": true
+		},
 		"legacy-title":{
 			"type": "title",
 			"name": "Legacy Settings",
@@ -307,7 +313,7 @@
 		"rgb-glow": {
 			"type": "bool",
 			"name": "Color 2 - RGB",
-			"description": "Enables RGB for Color 2.",
+			"description": "Enables RGB for Glow Color.",
 			"default": false
 		},
 		"rgb-speed": {
@@ -455,12 +461,19 @@
 			"description": "Enables the RGB effect to show on other particles, such as Ship and robot boost.",
 			"default": true
 		},
-		"ignore-p2": {
+		"rgb-enable-p2": {
 			"type": "bool",
-			"name": "Ignore Player 2",
-			"description": "Disables the RGB effect for Player 2.",
-			"enable-if": "rgb-col1 || rgb-col2",
-			"default": false
+			"name": "Enable P2 RGB",
+			"description": "Enable RGB effects for Player 2 (requires Separate Dual Icons mod)",
+			"default": false,
+			"enable-if": "rgb-col1 || rgb-col2"
+		},
+		"rgb-invert-p2": {
+			"type": "bool",
+			"name": "Invert P2 Colors",
+			"description": "Swap Color 1 and Color 2 for Player 2's RGB effect",
+			"default": false,
+			"enable-if": "rgb-enable-p2"
 		},
 		"p2-distance": {
 			"type": "float",
@@ -499,10 +512,16 @@
 			"name": "Full Icon Customization",
 			"description": "Full customization of player icon colors."
 		},
-		"enable-customcolors": {
+		"enable-customcolors-p1": {
 			"type": "bool",
-			"name": "Enable Custom Colors",
-			"description": "Enable custom colors for the icon.",
+			"name": "Enable P1 Custom Colors",
+			"description": "Enable custom colors for Player 1",
+			"default": false
+		},
+		"enable-customcolors-p2": {
+			"type": "bool",
+			"name": "Enable P2 Custom Colors",
+			"description": "Enable custom colors for Player 2 (requires Separate Dual Icons mod)",
 			"default": false
 		},
 		"p1-primary": {
@@ -804,15 +823,11 @@
 		"geode.custom-keybinds": {
 			"importance": "required",
 			"version": ">=1.10.0"
-		},
-		"capeling.garage-stats-menu": {
-			"importance": "required",
-			"version": ">=v1.0.1"
 		}
 	},
 	"id": "saritahhh.personal_tweaks",
 	"name": "Personal Tweaks",
-	"version": "v1.0.0",
+	"version": "v2.0.0",
 	"developer": "Saritahhh",
 	"description": "Personal tweaks i need for the game"
 }

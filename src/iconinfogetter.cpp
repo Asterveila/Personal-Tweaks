@@ -137,13 +137,16 @@ class $modify(ImSoLazyGarageLayer, GJGarageLayer) {
         auto buttonsMenu = CCMenu::create();
         buttonsMenu->setLayout(
             RowLayout::create()
-                ->setGap(4.f)
+                ->setGap(2.f)
                 ->setAxisAlignment(AxisAlignment::End)
-                ->setAxisReverse(true)
-                ->setCrossAxisOverflow(false)
+                ->setAxisReverse(false)
+                ->setGrowCrossAxis(true)
+                ->setCrossAxisOverflow(true)
+                ->setAutoScale(false)
         );
-        buttonsMenu->setContentSize({100.f, 40.f});
+        buttonsMenu->setContentSize({84.f, 84.f});
         buttonsMenu->setPosition({m_playerObject->getPositionX() + 90.f + extraOffset, m_playerObject->getPositionY()});
+        buttonsMenu->setScale(0.6f);
         buttonsMenu->setID("pt-buttons-menu"_spr);
         this->addChild(buttonsMenu);
 

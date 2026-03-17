@@ -7,6 +7,10 @@ auto mod = Mod::get();
 
 bool doCol1 = mod->getSettingValue<bool>("rgb-col1");
 bool doCol2 = mod->getSettingValue<bool>("rgb-col2");
+bool doGlow = mod->getSettingValue<bool>("rgb-glow");
+
+bool enableP2 = mod->getSettingValue<bool>("rgb-enable-p2");
+bool invertP2 = mod->getSettingValue<bool>("rgb-invert-p2");
 
 bool BMI = mod->getSettingValue<bool>("better-immersion-mode");
 
@@ -14,69 +18,51 @@ float rgbSpeed = mod->getSettingValue<double>("rgb-speed");
 
 float sat = mod->getSettingValue<double>("rgb-saturation");
 float sat2 = mod->getSettingValue<double>("rgb-saturation2");
+float satGlow = mod->getSettingValue<double>("rgb-glow-saturation");
 
 float bright1 = mod->getSettingValue<double>("rgb-brightness1");
 float bright2 = mod->getSettingValue<double>("rgb-brightness2");
+float brightGlow = mod->getSettingValue<double>("rgb-glow-brightness");
 
 bool doWaveColr = mod->getSettingValue<bool>("rgb-wave");
 bool doTrailColr = mod->getSettingValue<bool>("rgb-trail");
 bool doDashColr = mod->getSettingValue<bool>("rgb-dash");
 
 float p2Distance = mod->getSettingValue<double>("p2-distance");
-
-bool ignoreP2 = mod->getSettingValue<bool>("ignore-p2");
+float glowDistance = mod->getSettingValue<double>("glow-distance");
 
 $on_mod(Loaded){
-    listenForSettingChanges("rgb-col1", [](bool value) {
-        doCol1 = value;
-    });
-    listenForSettingChanges("rgb-col2", [](bool value) {
-        doCol2 = value;
-    });
-    listenForSettingChanges("ignore-p2", [](bool value) {
-        ignoreP2 = value;
-    });
-    listenForSettingChanges("rgb-saturation", [](double value) {
-        sat = value;
-    });
-    listenForSettingChanges("rgb-saturation2", [](double value) {
-        sat2 = value;
-    });
-    listenForSettingChanges("rgb-speed", [](double value) {
-        rgbSpeed = value;
-    });
-    listenForSettingChanges("rgb-brightness1", [](double value) {
-        bright1 = value;
-    });
-    listenForSettingChanges("rgb-brightness2", [](double value) {
-        bright2 = value;
-    });
-    listenForSettingChanges("p2-distance", [](double value) {
-        p2Distance = value;
-    });
-    listenForSettingChanges("better-immersion-mode", [](bool value) {
-        BMI = value;
-    });
-    listenForSettingChanges("rgb-wave", [](bool value) {
-        doWaveColr = value;
-    });
-    listenForSettingChanges("rgb-trail", [](bool value) {
-        doTrailColr = value;
-    });
-    listenForSettingChanges("rgb-dash", [](bool value) {
-        doDashColr = value;
-    });
+    listenForSettingChanges("rgb-col1", [](bool value) { doCol1 = value; });
+    listenForSettingChanges("rgb-col2", [](bool value) { doCol2 = value; });
+    listenForSettingChanges("rgb-glow", [](bool value) { doGlow = value; });
+    listenForSettingChanges("rgb-enable-p2", [](bool value) { enableP2 = value; });
+    listenForSettingChanges("rgb-invert-p2", [](bool value) { invertP2 = value; });
+    listenForSettingChanges("rgb-saturation", [](double value) { sat = value; });
+    listenForSettingChanges("rgb-saturation2", [](double value) { sat2 = value; });
+    listenForSettingChanges("rgb-glow-saturation", [](double value) { satGlow = value; });
+    listenForSettingChanges("rgb-speed", [](double value) { rgbSpeed = value; });
+    listenForSettingChanges("rgb-brightness1", [](double value) { bright1 = value; });
+    listenForSettingChanges("rgb-brightness2", [](double value) { bright2 = value; });
+    listenForSettingChanges("rgb-glow-brightness", [](double value) { brightGlow = value; });
+    listenForSettingChanges("p2-distance", [](double value) { p2Distance = value; });
+    listenForSettingChanges("glow-distance", [](double value) { glowDistance = value; });
+    listenForSettingChanges("better-immersion-mode", [](bool value) { BMI = value; });
+    listenForSettingChanges("rgb-wave", [](bool value) { doWaveColr = value; });
+    listenForSettingChanges("rgb-trail", [](bool value) { doTrailColr = value; });
+    listenForSettingChanges("rgb-dash", [](bool value) { doDashColr = value; });
 }
 
 class $modify(RGBPlayerObject, PlayerObject) {
     struct Fields {
         bool usingCol1 = doCol1;
         bool usingCol2 = doCol2;
+        bool usingGlow = doGlow;
+        bool usingP2 = enableP2;
+        bool invertingP2 = invertP2;
         bool usingBMI = BMI;
         bool usingWaveColr = doWaveColr;
         bool usingTrailColr = doTrailColr;
         bool usingDashColr = doDashColr;
-        bool isIgnoringP2 = ignoreP2;
         float rgbTimer = 0.f;
     };
 
@@ -84,13 +70,15 @@ class $modify(RGBPlayerObject, PlayerObject) {
         auto fld = m_fields.self();
         fld->usingCol1 = doCol1;
         fld->usingCol2 = doCol2;
+        fld->usingGlow = doGlow;
+        fld->usingP2 = enableP2;
+        fld->invertingP2 = invertP2;
         fld->usingBMI = BMI;
         fld->usingWaveColr = doWaveColr;
         fld->usingTrailColr = doTrailColr;
         fld->usingDashColr = doDashColr;
-        fld->isIgnoringP2 = ignoreP2;
     }
-    
+
     std::tuple<int, int, int> hsvToRgbRaw(float h, float s, float v) {
         float r, g, b;
         int i = int(h * 6);
@@ -120,37 +108,37 @@ class $modify(RGBPlayerObject, PlayerObject) {
         auto fld = m_fields.self();
         auto playLayer = PlayLayer::get();
         if (!playLayer) return;
-        if (fld->isIgnoringP2 && m_isSecondPlayer) return;
+        
+        // Check if RGB is enabled for this player
+        bool isP2 = m_isSecondPlayer;
+        bool rgbEnabled = isP2 ? fld->usingP2 : (fld->usingCol1 || fld->usingCol2 || fld->usingGlow);
+        if (!rgbEnabled) return;
 
         float cycleDuration = 64.0f / rgbSpeed;
-
         fld->rgbTimer += p0;
 
         float hue1 = fmod(fld->rgbTimer / cycleDuration, 1.f);
         float hue2 = fmod(hue1 + p2Distance, 1.f);
+        float hueGlow = fmod(hue1 + glowDistance, 1.f);
 
-        auto [r, g, b] = hsvToRgbRaw(hue1, sat, bright1);
-        auto [r2, g2, b2] = hsvToRgbRaw(hue2, sat2, bright2);
+        // For P2, determine if we should invert col1/col2
+        bool shouldInvert = isP2 && fld->invertingP2;
+        
+        // Calculate colors
+        auto [r, g, b] = hsvToRgbRaw(shouldInvert ? hue2 : hue1, shouldInvert ? sat2 : sat, shouldInvert ? bright2 : bright1);
+        auto [r2, g2, b2] = hsvToRgbRaw(shouldInvert ? hue1 : hue2, shouldInvert ? sat : sat2, shouldInvert ? bright1 : bright2);
+        auto [rGlow, gGlow, bGlow] = hsvToRgbRaw(hueGlow, satGlow, brightGlow);
 
-        cocos2d::ccColor4F colorForParticle({
-            r / 255.0f,
-            g / 255.0f,
-            b / 255.0f,
-            1.0f
-        });
+        cocos2d::ccColor4F colorForParticle({r / 255.0f, g / 255.0f, b / 255.0f, 1.0f});
+        cocos2d::ccColor4F colorForParticle2({r2 / 255.0f, g2 / 255.0f, b2 / 255.0f, 1.0f});
 
-        cocos2d::ccColor4F colorForParticle2({
-            r2 / 255.0f,
-            g2 / 255.0f,
-            b2 / 255.0f,
-            1.0f
-        });
-
+        // Apply Color 1 RGB
         if (fld->usingCol1) {
             m_playerColor1 = ccColor3B({static_cast<GLubyte>(r), static_cast<GLubyte>(g), static_cast<GLubyte>(b)});
 
             m_iconSprite->setColor({static_cast<GLubyte>(r), static_cast<GLubyte>(g), static_cast<GLubyte>(b)});
             m_vehicleSprite->setColor({static_cast<GLubyte>(r), static_cast<GLubyte>(g), static_cast<GLubyte>(b)});
+            
             if (m_isRobot) {
                 m_robotSprite->m_color = ccColor3B({static_cast<GLubyte>(r), static_cast<GLubyte>(g), static_cast<GLubyte>(b)});
             } else if (m_isSpider) {
@@ -161,7 +149,7 @@ class $modify(RGBPlayerObject, PlayerObject) {
                 m_ghostTrail->m_color = ccColor3B({static_cast<GLubyte>(r), static_cast<GLubyte>(g), static_cast<GLubyte>(b)});
             }
 
-            //particles bc other mods don't do them lol
+            // Particles
             m_playerGroundParticles->m_tStartColor = colorForParticle;
             m_playerGroundParticles->m_tEndColor = colorForParticle;
             m_vehicleGroundParticles->m_tStartColor = colorForParticle;
@@ -174,29 +162,30 @@ class $modify(RGBPlayerObject, PlayerObject) {
             m_ufoClickParticles->m_tEndColor = colorForParticle;
         }
 
+        // Apply Wave RGB
         if (m_waveTrail && fld->usingWaveColr) {
             m_waveTrail->setColor({static_cast<GLubyte>(r), static_cast<GLubyte>(g), static_cast<GLubyte>(b)});
         }
 
+        // Apply Dash RGB
         if (m_dashFireSprite && fld->usingDashColr) {
             m_dashFireSprite->setColor({static_cast<GLubyte>(r), static_cast<GLubyte>(g), static_cast<GLubyte>(b)});
             m_dashParticles->m_tStartColor = colorForParticle;
             m_dashParticles->m_tEndColor = colorForParticle;
         }
 
+        // Apply Trail RGB
         if (m_regularTrail && fld->usingTrailColr) {
             m_regularTrail->setColor({static_cast<GLubyte>(r), static_cast<GLubyte>(g), static_cast<GLubyte>(b)});
         }
 
-        // -----------------------------
-        // color 2 hehe
-        // -----------------------------
-        
+        // Apply Color 2 RGB
         if (fld->usingCol2) {
             m_playerColor2 = ccColor3B({static_cast<GLubyte>(r2), static_cast<GLubyte>(g2), static_cast<GLubyte>(b2)});
 
             m_iconSpriteSecondary->setColor({static_cast<GLubyte>(r2), static_cast<GLubyte>(g2), static_cast<GLubyte>(b2)});
             m_vehicleSpriteSecondary->setColor({static_cast<GLubyte>(r2), static_cast<GLubyte>(g2), static_cast<GLubyte>(b2)});
+            
             if (m_isRobot) {
                 m_robotSprite->m_secondColor = ccColor3B({static_cast<GLubyte>(r2), static_cast<GLubyte>(g2), static_cast<GLubyte>(b2)});
             } else if (m_isSpider) {
@@ -207,17 +196,31 @@ class $modify(RGBPlayerObject, PlayerObject) {
             }
         }
         
-        if (m_isRobot) {
-            if (fld->usingCol1 || fld->usingCol2) {
-                m_robotSprite->updateColors();
+        // Apply Glow RGB
+        if (fld->usingGlow && GameManager::sharedState()->getPlayerGlow()) {
+            auto glowColor = ccColor3B({static_cast<GLubyte>(rGlow), static_cast<GLubyte>(gGlow), static_cast<GLubyte>(bGlow)});
+            
+            if (m_iconGlow) {
+                m_iconGlow->setColor(glowColor);
             }
-        } else if (m_isSpider) {
-            if (fld->usingCol1 || fld->usingCol2) {
-                m_spiderSprite->updateColors();
+            if (m_vehicleGlow) {
+                m_vehicleGlow->setColor(glowColor);
+            }
+            if (m_isRobot && m_robotSprite && m_robotSprite->m_glowSprite) {
+                m_robotSprite->m_glowSprite->setColor(glowColor);
+            } else if (m_isSpider && m_spiderSprite && m_spiderSprite->m_glowSprite) {
+                m_spiderSprite->m_glowSprite->setColor(glowColor);
             }
         }
+        
+        // Update robot/spider colors
+        if (m_isRobot && (fld->usingCol1 || fld->usingCol2)) {
+            m_robotSprite->updateColors();
+        } else if (m_isSpider && (fld->usingCol1 || fld->usingCol2)) {
+            m_spiderSprite->updateColors();
+        }
 
-        // immersion mode
+        // Immersion mode
         if (fld->usingBMI) {
             if (m_isShip) {
                 m_trailingParticles->m_tStartColor = colorForParticle;
@@ -240,9 +243,11 @@ class $modify(RGBPlayerObject, PlayerObject) {
 class $modify(RGBPlayLayer, PlayLayer) {
     void resume() {
         PlayLayer::resume();
+        static_cast<RGBPlayerObject*>(m_player1)->updateMyRGBSettings();
     }
-
+    
     void resumeAndRestart(bool p0) {
         PlayLayer::resumeAndRestart(p0);
+        static_cast<RGBPlayerObject*>(m_player1)->updateMyRGBSettings();
     }
 };

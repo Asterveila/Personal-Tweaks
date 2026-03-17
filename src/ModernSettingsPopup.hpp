@@ -55,6 +55,7 @@ protected:
     CCNode* createSectionTitleWithToggle(const std::string& title, const std::string& settingId, float width);
     CCNode* createSection(const std::string& title, float width);
     CCNode* createLabelToggleRow(const std::string& labelText, const std::string& settingId, float width, float labelScale = 0.4f, float toggleScale = 0.65f);
+    CCNode* createSmallLabelToggleRow(const std::string& labelText, const std::string& settingId, float labelScale = 0.4f, float toggleScale = 0.65f);
     CCNode* createParticleToggleRow(const std::string& labelText, const std::string& settingId, float width);
     CCNode* createLabelSliderRow(const std::string& labelText, const std::string& settingId, float width, float labelScale = 0.38f);
     CCNode* createLabelColorRow(const std::string& labelText, const std::string& colorSettingId, float width, const std::string& toggleSettingId = "", float labelScale = 0.38f);

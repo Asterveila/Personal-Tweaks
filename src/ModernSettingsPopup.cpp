@@ -497,7 +497,7 @@ void ModernSettingsPopup::buildRGBContent() {
     leftColumn->setContentSize({0, 0});
     leftColumn->setLayout(
         ColumnLayout::create()
-            ->setGap(4.0f)
+            ->setGap(2.0f)
             ->setAxisAlignment(AxisAlignment::Even)
             ->setAxisReverse(true)
             ->setAutoScale(false)
@@ -525,6 +525,7 @@ void ModernSettingsPopup::buildRGBContent() {
     leftColumn->addChild(createSectionTitleWithToggle("Color 2", "rgb-col2", 140.0f));
     leftColumn->addChild(createLabelSliderRow("Brightness", "rgb-brightness2", 140.0f, 0.32f));
     leftColumn->addChild(createLabelSliderRow("Saturation", "rgb-saturation2", 140.0f, 0.32f));
+    leftColumn->addChild(createLabelSliderRow("Col2 Distance", "p2-distance", 140.0f, 0.32f));
 
     auto spacer3 = CCNode::create();
     spacer3->setContentSize({1, 8});
@@ -534,6 +535,7 @@ void ModernSettingsPopup::buildRGBContent() {
     leftColumn->addChild(createSectionTitleWithToggle("Glow", "rgb-glow", 140.0f));
     leftColumn->addChild(createLabelSliderRow("Brightness", "rgb-glow-brightness", 140.0f, 0.32f));
     leftColumn->addChild(createLabelSliderRow("Saturation", "rgb-glow-saturation", 140.0f, 0.32f));
+    leftColumn->addChild(createLabelSliderRow("Glow Distance", "glow-distance", 140.0f, 0.32f));
     
     leftColumn->updateLayout();
     m_contentContainer->addChild(leftColumn);
@@ -543,7 +545,7 @@ void ModernSettingsPopup::buildRGBContent() {
     rightColumn->setContentSize({0, 0});
     rightColumn->setLayout(
         ColumnLayout::create()
-            ->setGap(4.0f)
+            ->setGap(3.0f)
             ->setAxisAlignment(AxisAlignment::Even)
             ->setAxisReverse(true)
             ->setAutoScale(false)
@@ -557,16 +559,20 @@ void ModernSettingsPopup::buildRGBContent() {
         {"rgb-wave", "RGB Wave"},
         {"rgb-trail", "RGB Trail"},
         {"rgb-dash", "RGB Dash"},
-        {"better-immersion-mode", "Immersion"},
-        {"ignore-p2", "Ignore P2"}
+        {"better-immersion-mode", "Immersion"}
     };
     
     for (const auto& [settingId, name] : extras) {
         rightColumn->addChild(createLabelToggleRow(name, settingId, 140.0f, 0.32f, 0.55f));
     }
     
-    rightColumn->addChild(createLabelSliderRow("Col2 Distance", "p2-distance", 140.0f, 0.32f));
-    rightColumn->addChild(createLabelSliderRow("Glow Distance", "glow-distance", 140.0f, 0.32f));
+    auto spacer4 = CCNode::create();
+    spacer4->setContentSize({1, 8});
+    rightColumn->addChild(spacer4);
+    
+    rightColumn->addChild(createSectionTitle("Player 2"));
+    rightColumn->addChild(createLabelToggleRow("Enable P2", "rgb-enable-p2", 140.0f, 0.32f, 0.55f));
+    rightColumn->addChild(createLabelToggleRow("Invert P2", "rgb-invert-p2", 140.0f, 0.32f, 0.55f));
     
     rightColumn->updateLayout();
     m_contentContainer->addChild(rightColumn);
@@ -602,8 +608,23 @@ void ModernSettingsPopup::buildColorsContent() {
             ->setAutoGrowAxis(true)
             ->setCrossAxisLineAlignment(AxisAlignment::Start)
     );
+
+    auto togglersContainer = CCNode::create();
+    togglersContainer->setContentSize({0, 0});
+    togglersContainer->setLayout(
+        RowLayout::create()
+            ->setGap(5.f)
+            ->setAxisAlignment(AxisAlignment::Start)
+            ->setAxisReverse(false)
+            ->setAutoScale(false)
+            ->setAutoGrowAxis(true)
+            ->setCrossAxisLineAlignment(AxisAlignment::Start)
+    );
     
-    colorsColumn->addChild(createLabelToggleRow("Enable", "enable-customcolors", 100.f, 0.38f, 0.65f));
+    togglersContainer->addChild(createSmallLabelToggleRow("Enable P1", "enable-customcolors-p1", 0.25f, 0.5f));
+    togglersContainer->addChild(createSmallLabelToggleRow("Enable P2", "enable-customcolors-p2", 0.25f, 0.5f));
+    togglersContainer->updateLayout();
+    colorsColumn->addChild(togglersContainer);
     
     auto playersRow = CCNode::create();
     playersRow->setContentSize({0, 0});
@@ -1030,6 +1051,34 @@ CCNode* ModernSettingsPopup::createLabelToggleRow(const std::string& labelText, 
             ->setCrossAxisAlignment(AxisAlignment::Center)
             ->setAutoScale(false)
             ->setGrowCrossAxis(true)
+    );
+    
+    // @geode-ignore(unknown-resource)
+    auto label = CCLabelBMFont::create(labelText.c_str(), "modernMain.fnt"_spr);
+    label->setScale(labelScale);
+    label->setOpacity(190);
+    label->setAnchorPoint({0, 0.5f});
+    menu->addChild(label);
+    
+    auto toggler = createToggler(settingId, {0, 0});
+    toggler->setScale(toggleScale);
+    menu->addChild(toggler);
+    
+    menu->updateLayout();
+    
+    return menu;
+}
+
+CCNode* ModernSettingsPopup::createSmallLabelToggleRow(const std::string& labelText, const std::string& settingId, float labelScale, float toggleScale) {
+    auto menu = CCMenu::create();
+    menu->setContentSize({0.f, 0.f});
+    menu->setLayout(
+        RowLayout::create()
+            ->setAxisAlignment(AxisAlignment::Between)
+            ->setCrossAxisAlignment(AxisAlignment::Center)
+            ->setAutoScale(false)
+            ->setGrowCrossAxis(true)
+            ->setAutoGrowAxis(true)
     );
     
     // @geode-ignore(unknown-resource)
@@ -1489,19 +1538,19 @@ void ModernSettingsPopup::onSlider(CCObject* sender) {
             std::string t = std::to_string(mapped).substr(0,4);
             this->m_valueLabels[tag]->setString(t.c_str());
         }
-    } else if (settingIdStr == "rgb-saturation" || settingIdStr == "rgb-saturation2") {
+    } else if (settingIdStr == "rgb-saturation" || settingIdStr == "rgb-saturation2" || settingIdStr == "rgb-glow-saturation") {
         Mod::get()->setSettingValue<double>(settingIdStr, value);
         if (this->m_valueLabels.count(tag)) {
             std::string t = std::to_string(value).substr(0,4);
             this->m_valueLabels[tag]->setString(t.c_str());
         }
-    } else if (settingIdStr == "rgb-brightness1" || settingIdStr == "rgb-brightness2") {
+    } else if (settingIdStr == "rgb-brightness1" || settingIdStr == "rgb-brightness2" || settingIdStr == "rgb-glow-brightness") {
         Mod::get()->setSettingValue<double>(settingIdStr, value);
         if (this->m_valueLabels.count(tag)) {
             std::string t = std::to_string(value).substr(0,4);
             this->m_valueLabels[tag]->setString(t.c_str());
         }
-    } else if (settingIdStr == "p2-distance") {
+    } else if (settingIdStr == "p2-distance" || settingIdStr == "glow-distance") {
         Mod::get()->setSettingValue<double>(settingIdStr, value);
         if (this->m_valueLabels.count(tag)) {
             std::string t = std::to_string(value).substr(0,4);

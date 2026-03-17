@@ -1,6 +1,8 @@
 #pragma once
 #include "cocos2d.h"
 #include <Geode/binding/GJBaseGameLayer.hpp>
+#include <time.h>
+#include <string>
 
 class SarahsTweaks {
 public:
