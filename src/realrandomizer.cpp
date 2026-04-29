@@ -27,73 +27,73 @@ auto randOnClick    = Mod::get()->getSettingValue<bool>("cond-onclick");
 auto randOnDeath    = Mod::get()->getSettingValue<bool>("cond-ondeath");
 
 $on_mod(Loaded){
-    listenForSettingChanges("cond-ic-randomizer", [](bool value) {
+    listenForSettingChanges<bool>("cond-ic-randomizer", [](bool value) {
         doCondRandomize = value;
     });
-    listenForSettingChanges("live-ic-randomizer", [](bool value) {
+    listenForSettingChanges<bool>("live-ic-randomizer", [](bool value) {
         doLiveRandomize = value;
     });
-    listenForSettingChanges("random-delay", [](double value) {
+    listenForSettingChanges<double>("random-delay", [](double value) {
         maxDelay = value;
     });
-    listenForSettingChanges("randomize-cube", [](bool value) {
+    listenForSettingChanges<bool>("randomize-cube", [](bool value) {
         randomizeCube = value;
     });
-    listenForSettingChanges("randomize-ship", [](bool value) {
+    listenForSettingChanges<bool>("randomize-ship", [](bool value) {
         randomizeShip = value;
     });
-    listenForSettingChanges("randomize-ball", [](bool value) {
+    listenForSettingChanges<bool>("randomize-ball", [](bool value) {
         randomizeBall = value;
     });
-    listenForSettingChanges("randomize-ufo", [](bool value) {
+    listenForSettingChanges<bool>("randomize-ufo", [](bool value) {
         randomizeUfo = value;
     });
-    listenForSettingChanges("randomize-wave", [](bool value) {
+    listenForSettingChanges<bool>("randomize-wave", [](bool value) {
         randomizeWave = value;
     });
-    listenForSettingChanges("randomize-robot", [](bool value) {
+    listenForSettingChanges<bool>("randomize-robot", [](bool value) {
         randomizeRobot = value;
     });
-    listenForSettingChanges("randomize-spider", [](bool value) {
+    listenForSettingChanges<bool>("randomize-spider", [](bool value) {
         randomizeSpider = value;
     });
-    listenForSettingChanges("randomize-swing", [](bool value) {
+    listenForSettingChanges<bool>("randomize-swing", [](bool value) {
         randomizeSwing = value;
     });
-    listenForSettingChanges("randomize-color1", [](bool value) {
+    listenForSettingChanges<bool>("randomize-color1", [](bool value) {
         randomizeCol1 = value;
     });
-    listenForSettingChanges("randomize-color2", [](bool value) {
+    listenForSettingChanges<bool>("randomize-color2", [](bool value) {
         randomizeCol2 = value;
     });
-    listenForSettingChanges("randomize-glowcolor", [](bool value) {
+    listenForSettingChanges<bool>("randomize-glowcolor", [](bool value) {
         randomizeGlowCol = value;
     });
-    listenForSettingChanges("cond-ongamemodechange", [](bool value) {
+    listenForSettingChanges<bool>("cond-ongamemodechange", [](bool value) {
         randOnGamemode = value;
     });
-    listenForSettingChanges("cond-onclick", [](bool value) {
+    listenForSettingChanges<bool>("cond-onclick", [](bool value) {
         randOnClick = value;
     });
-    listenForSettingChanges("cond-ondeath", [](bool value) {
+    listenForSettingChanges<bool>("cond-ondeath", [](bool value) {
         randOnDeath = value;
     });
 }
 
 static constexpr RandomizeType modeTypes[8] = {
-    ICON_RANDOMIZER_API_CUBE,
-    ICON_RANDOMIZER_API_SHIP,
-    ICON_RANDOMIZER_API_BALL,
-    ICON_RANDOMIZER_API_UFO,
-    ICON_RANDOMIZER_API_WAVE,
-    ICON_RANDOMIZER_API_ROBOT,
-    ICON_RANDOMIZER_API_SPIDER,
-    ICON_RANDOMIZER_API_SWING
+    RandomizeType::Cube,
+    RandomizeType::Ship,
+    RandomizeType::Ball,
+    RandomizeType::Ufo,
+    RandomizeType::Wave,
+    RandomizeType::Robot,
+    RandomizeType::Spider,
+    RandomizeType::Swing
 };
 static constexpr RandomizeType colorTypes[3] = {
-    ICON_RANDOMIZER_API_COLOR_1,
-    ICON_RANDOMIZER_API_COLOR_2,
-    ICON_RANDOMIZER_API_GLOW_COLOR
+    RandomizeType::Color1,
+    RandomizeType::Color2,
+    RandomizeType::GlowColor
 };
 
 void updatePlayerFrames(PlayerObject* player) {
@@ -169,9 +169,9 @@ void updatePlayerFramesLive(PlayerObject* player) {
     } else if (swing) {
         player->updatePlayerSwingFrame(gameManager->getPlayerSwing());
     } else if (robot) {
-        MoreIcons::updatePlayerObject(player);
+        more_icons::updatePlayerObject(player);
     } else if (spider) {
-        MoreIcons::updatePlayerObject(player);
+        more_icons::updatePlayerObject(player);
     } else if (cube) {
         player->updatePlayerFrame(gameManager->getPlayerFrame());
     } else {
@@ -343,38 +343,38 @@ class $modify(RandomizerPL, PlayLayer) {
             IconRandomizer::init();
             
             if (cube && randomizeCube) {
-                IconRandomizer::randomize(ICON_RANDOMIZER_API_CUBE);
+                IconRandomizer::randomize(RandomizeType::Cube);
             }
             if (m_player1->m_isShip && randomizeShip) {
-                IconRandomizer::randomize(ICON_RANDOMIZER_API_SHIP);
+                IconRandomizer::randomize(RandomizeType::Ship);
             }
             if (m_player1->m_isBall && randomizeBall) {
-                IconRandomizer::randomize(ICON_RANDOMIZER_API_BALL);
+                IconRandomizer::randomize(RandomizeType::Ball);
             }
             if (m_player1->m_isBird && randomizeUfo) {
-                IconRandomizer::randomize(ICON_RANDOMIZER_API_UFO);
+                IconRandomizer::randomize(RandomizeType::Ufo);
             }
             if (m_player1->m_isDart && randomizeWave) {
-                IconRandomizer::randomize(ICON_RANDOMIZER_API_WAVE);
+                IconRandomizer::randomize(RandomizeType::Wave);
             }
             if (m_player1->m_isRobot && randomizeRobot) {
-                IconRandomizer::randomize(ICON_RANDOMIZER_API_ROBOT);
+                IconRandomizer::randomize(RandomizeType::Robot);
             }
             if (m_player1->m_isSpider && randomizeSpider) {
-                IconRandomizer::randomize(ICON_RANDOMIZER_API_SPIDER);
+                IconRandomizer::randomize(RandomizeType::Spider);
             }
             if (m_player1->m_isSwing && randomizeSwing) {
-                IconRandomizer::randomize(ICON_RANDOMIZER_API_SWING);
+                IconRandomizer::randomize(RandomizeType::Swing);
             }
 
             if (randomizeCol1) {
-                IconRandomizer::randomize(ICON_RANDOMIZER_API_COLOR_1, true); 
+                IconRandomizer::randomize(RandomizeType::Color1, true); 
             }
             if (randomizeCol2) {
-                IconRandomizer::randomize(ICON_RANDOMIZER_API_COLOR_2, true);
+                IconRandomizer::randomize(RandomizeType::Color2, true);
             }
             if (randomizeGlowCol) {
-                IconRandomizer::randomize(ICON_RANDOMIZER_API_GLOW_COLOR, true);
+                IconRandomizer::randomize(RandomizeType::GlowColor, true);
             }     
 
             updatePlayerColors(m_player1);

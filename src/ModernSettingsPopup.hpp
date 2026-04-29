@@ -3,7 +3,7 @@
 #include <Geode/Geode.hpp>
 #include <Geode/ui/Popup.hpp>
 #include <unordered_map>
-#include "BlurLayer.hpp"
+#include "BlurAPI.hpp"
 
 using namespace geode::prelude;
 
@@ -15,7 +15,7 @@ enum class SettingsCategory {
     Legacy
 };
 
-class ModernSettingsPopup : public Popup<>, public geode::ColorPickPopupDelegate {
+class ModernSettingsPopup : public Popup {
 protected:
     SettingsCategory m_currentCategory = SettingsCategory::Randomizer;
     CCNode* m_contentArea = nullptr;
@@ -24,7 +24,7 @@ protected:
     CCLabelBMFont* m_titleLabel = nullptr;
     CCSprite* m_separator = nullptr;
     CCSprite* m_areaSeparator = nullptr;
-    BlurLayer* m_blurLayer = nullptr;
+    CCScale9Sprite* m_blurCutout = nullptr;
     CCSprite* m_animSprite = nullptr;
     std::unordered_map<SettingsCategory, CCMenuItemSprite*> m_categoryButtons;
     
@@ -34,7 +34,7 @@ protected:
     CCSprite* m_currentButtonSprite = nullptr;
     bool m_isColor4B = false;
     
-    bool setup() override;
+    bool init() override;
     void setupSidebar();
     void setupContentArea();
     
@@ -71,7 +71,7 @@ protected:
     void onSlider(CCObject* sender);
     void onColorPicker(CCObject* sender);
     void onModSettings(CCObject* sender);
-    void updateColor(cocos2d::ccColor4B const& color) override;
+    void updateColor(cocos2d::ccColor4B const& color);
     void onAnimationComplete();
     
 public:

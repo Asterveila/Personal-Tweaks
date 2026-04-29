@@ -6,7 +6,7 @@ using namespace geode::prelude;
 bool enableBallBug = Mod::get()->getSettingValue<bool>("ballrot-bug");
 
 $on_mod(Loaded) {
-    listenForSettingChanges("ballrot-bug", [](bool value) {
+    listenForSettingChanges<bool>("ballrot-bug", [](bool value) {
         enableBallBug = value;
     });
 }
@@ -26,5 +26,3 @@ class $modify (PlayerObject)
         }
     }
 };
-
-// Also set their content size to 240, 40.

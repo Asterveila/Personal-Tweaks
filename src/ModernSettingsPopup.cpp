@@ -1,20 +1,22 @@
 #include "ModernSettingsPopup.hpp"
-#include "ShaderCache.h"
 #include <Geode/ui/GeodeUI.hpp>
 
 ModernSettingsPopup* ModernSettingsPopup::create() {
     auto ret = new ModernSettingsPopup();
-    auto winSize = CCDirector::sharedDirector()->getWinSize();
-    if (ret->initAnchored(winSize.width * 0.9f, winSize.height * 0.85f, "modernSquare01.png"_spr)) {
+    if (ret->init()) {
         ret->autorelease();
         return ret;
     }
+
     delete ret;
     return nullptr;
 }
 
 
-bool ModernSettingsPopup::setup() {
+bool ModernSettingsPopup::init() {
+    float pSizeX = CCDirector::sharedDirector()->getWinSize().width * 0.9f;
+    float pSizeY = CCDirector::sharedDirector()->getWinSize().height * 0.85f;
+    if (!Popup::init(pSizeX, pSizeY, "modernSquare01.png"_spr)) return false;
     auto size = this->m_mainLayer->getContentSize();
     this->setTitle("SEXO");
     this->m_noElasticity = true;
@@ -30,16 +32,17 @@ bool ModernSettingsPopup::setup() {
 
     if (this->m_title) this->m_title->setVisible(false);
 
-    #ifndef GEODE_IS_ANDROID
-    this->setOpacity(0);
-    m_blurLayer = BlurLayer::create();
-    m_blurLayer->setID("modern-popup-blur");
-    m_blurLayer->setZOrder(-100);
-    m_blurLayer->setOpacity(0);
-    this->addChild(m_blurLayer);
+    this->setOpacity(10);
+    m_blurCutout = CCScale9Sprite::create("fullWhiteModernSquare.png"_spr);
+    m_blurCutout->setContentSize(size);
+    m_blurCutout->setID("modern-popup-blur");
+    m_blurCutout->setZOrder(-100);
+    m_blurCutout->setOpacity(0);
+    m_blurCutout->setColor({0, 0, 0});
+    BlurAPI::addBlur(m_blurCutout);
+    this->addChild(m_blurCutout);
     
-    m_blurLayer->runAction(CCFadeTo::create(0.25f, 200));
-    #endif
+    m_blurCutout->runAction(CCFadeTo::create(0.25f, 100));
     
     setupSidebar();
     setupContentArea();
@@ -1611,7 +1614,9 @@ void ModernSettingsPopup::onColorPicker(CCObject* sender) {
     }
     
     if (colorPopup) {
-        colorPopup->setDelegate(this);
+        colorPopup->setCallback([this](cocos2d::ccColor4B color) {
+            this->updateColor(color);
+        });
         colorPopup->show();
     }
 }

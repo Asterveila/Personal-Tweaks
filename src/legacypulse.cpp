@@ -6,10 +6,10 @@ float legacyFPS = Mod::get()->getSettingValue<int64_t>("pulse-fps");
 bool legacyPulseEnabled = Mod::get()->getSettingValue<bool>("legacy-pulse");
 
 $on_mod(Loaded){
-	listenForSettingChanges("pulse-fps", [](int value) {
+	listenForSettingChanges<int64_t>("pulse-fps", [](int value) {
         legacyFPS = value;
     });
-    listenForSettingChanges("legacy-pulse", [](bool value) {
+    listenForSettingChanges<bool>("legacy-pulse", [](bool value) {
         legacyPulseEnabled = value;
     });
 }

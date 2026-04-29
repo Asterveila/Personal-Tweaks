@@ -9,7 +9,7 @@ using namespace geode::prelude;
 bool iconListingEnabled = Mod::get()->getSettingValue<bool>("iconlist-ft");
 
 $on_mod(Loaded) {
-    listenForSettingChanges("iconlist-ft", [](bool value) {
+    listenForSettingChanges<bool>("iconlist-ft", [](bool value) {
         iconListingEnabled = value;
     });
 }
@@ -23,8 +23,8 @@ class $modify(ImSoLazyGarageLayer, GJGarageLayer) {
         auto addedSpr = CCSprite::create("addToList.png"_spr);
         auto fields = m_fields.self();
 
-        IconInfo* selectedIcon = MoreIcons::getIcon(m_selectedIconType);
-        std::string iconName = selectedIcon->shortName;
+        IconInfo* selectedIcon = more_icons::activeIcon(m_selectedIconType);
+        std::string iconName = selectedIcon->getShortName();
 
         fields->m_iconList.push_back(iconName);
 
@@ -98,15 +98,15 @@ class $modify(ImSoLazyGarageLayer, GJGarageLayer) {
     }
 
     void countMixIcons(CCObject* sender) {
-        size_t cubeCount    = MoreIcons::getIcons(IconType::Cube).size();
-        size_t shipCount    = MoreIcons::getIcons(IconType::Ship).size();
-        size_t ballCount    = MoreIcons::getIcons(IconType::Ball).size();
-        size_t ufoCount     = MoreIcons::getIcons(IconType::Ufo).size();
-        size_t waveCount    = MoreIcons::getIcons(IconType::Wave).size();
-        size_t robotCount   = MoreIcons::getIcons(IconType::Robot).size();
-        size_t spiderCount  = MoreIcons::getIcons(IconType::Spider).size();
-        size_t swingCount   = MoreIcons::getIcons(IconType::Swing).size();
-        size_t jetpackCount = MoreIcons::getIcons(IconType::Jetpack).size();
+        size_t cubeCount    = more_icons::getIconCount(IconType::Cube);
+        size_t shipCount    = more_icons::getIconCount(IconType::Ship);
+        size_t ballCount    = more_icons::getIconCount(IconType::Ball);
+        size_t ufoCount     = more_icons::getIconCount(IconType::Ufo);
+        size_t waveCount    = more_icons::getIconCount(IconType::Wave);
+        size_t robotCount   = more_icons::getIconCount(IconType::Robot);
+        size_t spiderCount  = more_icons::getIconCount(IconType::Spider);
+        size_t swingCount   = more_icons::getIconCount(IconType::Swing);
+        size_t jetpackCount = more_icons::getIconCount(IconType::Jetpack);
 
         size_t total = cubeCount + shipCount + ballCount + ufoCount + waveCount + robotCount + spiderCount + swingCount + jetpackCount;
 
@@ -116,8 +116,8 @@ class $modify(ImSoLazyGarageLayer, GJGarageLayer) {
             robotCount, spiderCount, swingCount, jetpackCount, total
         );
 
-        IconInfo* thing = MoreIcons::getIcon(m_selectedIconType);
-        std::string packInfoString = fmt::format("{} Info", thing->packName);
+        IconInfo* thing = more_icons::activeIcon(m_selectedIconType);
+        std::string packInfoString = fmt::format("{} Info", thing->getPackName());
 
         FLAlertLayer::create(packInfoString.c_str(), infoData.c_str(), "ok")->show();
     }

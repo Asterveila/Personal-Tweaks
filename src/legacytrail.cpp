@@ -7,13 +7,13 @@ bool isLegacyTrailEnabled = Mod::get()->getSettingValue<bool>("use-legacytrail")
 float minSegTuner = Mod::get()->getSettingValue<double>("segment-tuner");
 
 $on_mod(Loaded){
-	listenForSettingChanges("max-points", [](int value) {
+	listenForSettingChanges<int64_t>("max-points", [](int value) {
         trailMaxPts = value;
     });
-	listenForSettingChanges("use-legacytrail", [](bool value) {
+	listenForSettingChanges<bool>("use-legacytrail", [](bool value) {
 		isLegacyTrailEnabled = value;
 	});
-	listenForSettingChanges("segment-tuner", [](double value) {
+	listenForSettingChanges<double>("segment-tuner", [](double value) {
 		minSegTuner = value;
 	});
 }

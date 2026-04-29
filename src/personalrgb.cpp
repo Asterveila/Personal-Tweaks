@@ -32,24 +32,24 @@ float p2Distance = mod->getSettingValue<double>("p2-distance");
 float glowDistance = mod->getSettingValue<double>("glow-distance");
 
 $on_mod(Loaded){
-    listenForSettingChanges("rgb-col1", [](bool value) { doCol1 = value; });
-    listenForSettingChanges("rgb-col2", [](bool value) { doCol2 = value; });
-    listenForSettingChanges("rgb-glow", [](bool value) { doGlow = value; });
-    listenForSettingChanges("rgb-enable-p2", [](bool value) { enableP2 = value; });
-    listenForSettingChanges("rgb-invert-p2", [](bool value) { invertP2 = value; });
-    listenForSettingChanges("rgb-saturation", [](double value) { sat = value; });
-    listenForSettingChanges("rgb-saturation2", [](double value) { sat2 = value; });
-    listenForSettingChanges("rgb-glow-saturation", [](double value) { satGlow = value; });
-    listenForSettingChanges("rgb-speed", [](double value) { rgbSpeed = value; });
-    listenForSettingChanges("rgb-brightness1", [](double value) { bright1 = value; });
-    listenForSettingChanges("rgb-brightness2", [](double value) { bright2 = value; });
-    listenForSettingChanges("rgb-glow-brightness", [](double value) { brightGlow = value; });
-    listenForSettingChanges("p2-distance", [](double value) { p2Distance = value; });
-    listenForSettingChanges("glow-distance", [](double value) { glowDistance = value; });
-    listenForSettingChanges("better-immersion-mode", [](bool value) { BMI = value; });
-    listenForSettingChanges("rgb-wave", [](bool value) { doWaveColr = value; });
-    listenForSettingChanges("rgb-trail", [](bool value) { doTrailColr = value; });
-    listenForSettingChanges("rgb-dash", [](bool value) { doDashColr = value; });
+    listenForSettingChanges<bool>("rgb-col1", [](bool value) { doCol1 = value; });
+    listenForSettingChanges<bool>("rgb-col2", [](bool value) { doCol2 = value; });
+    listenForSettingChanges<bool>("rgb-glow", [](bool value) { doGlow = value; });
+    listenForSettingChanges<bool>("rgb-enable-p2", [](bool value) { enableP2 = value; });
+    listenForSettingChanges<bool>("rgb-invert-p2", [](bool value) { invertP2 = value; });
+    listenForSettingChanges<double>("rgb-saturation", [](double value) { sat = value; });
+    listenForSettingChanges<double>("rgb-saturation2", [](double value) { sat2 = value; });
+    listenForSettingChanges<double>("rgb-glow-saturation", [](double value) { satGlow = value; });
+    listenForSettingChanges<double>("rgb-speed", [](double value) { rgbSpeed = value; });
+    listenForSettingChanges<double>("rgb-brightness1", [](double value) { bright1 = value; });
+    listenForSettingChanges<double>("rgb-brightness2", [](double value) { bright2 = value; });
+    listenForSettingChanges<double>("rgb-glow-brightness", [](double value) { brightGlow = value; });
+    listenForSettingChanges<double>("p2-distance", [](double value) { p2Distance = value; });
+    listenForSettingChanges<double>("glow-distance", [](double value) { glowDistance = value; });
+    listenForSettingChanges<bool>("better-immersion-mode", [](bool value) { BMI = value; });
+    listenForSettingChanges<bool>("rgb-wave", [](bool value) { doWaveColr = value; });
+    listenForSettingChanges<bool>("rgb-trail", [](bool value) { doTrailColr = value; });
+    listenForSettingChanges<bool>("rgb-dash", [](bool value) { doDashColr = value; });
 }
 
 class $modify(RGBPlayerObject, PlayerObject) {

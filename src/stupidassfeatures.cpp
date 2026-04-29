@@ -11,10 +11,10 @@ auto doAnimation = Mod::get()->getSettingValue<bool>("garage-select-anim");
 auto noMirror = Mod::get()->getSettingValue<bool>("nomirror");
 
 $on_mod(Loaded){
-    listenForSettingChanges("garage-select-anim", [](bool value) {
+    listenForSettingChanges<bool>("garage-select-anim", [](bool value) {
         doAnimation = value;
     });
-    listenForSettingChanges("nomirror", [](bool value) {
+    listenForSettingChanges<bool>("nomirror", [](bool value) {
         noMirror = value;
     });
 }
