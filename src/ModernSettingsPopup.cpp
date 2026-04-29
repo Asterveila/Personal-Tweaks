@@ -33,16 +33,7 @@ bool ModernSettingsPopup::init() {
     if (this->m_title) this->m_title->setVisible(false);
 
     this->setOpacity(10);
-    m_blurCutout = CCScale9Sprite::create("fullWhiteModernSquare.png"_spr);
-    m_blurCutout->setContentSize(size);
-    m_blurCutout->setID("modern-popup-blur");
-    m_blurCutout->setZOrder(-100);
-    m_blurCutout->setOpacity(0);
-    m_blurCutout->setColor({0, 0, 0});
-    BlurAPI::addBlur(m_blurCutout);
-    this->addChild(m_blurCutout);
-    
-    m_blurCutout->runAction(CCFadeTo::create(0.25f, 100));
+    BlurAPI::addBlur(m_mainLayer);
     
     setupSidebar();
     setupContentArea();
@@ -60,57 +51,6 @@ bool ModernSettingsPopup::init() {
     optMenu->setScale(0.8f);
     optMenu->setPosition({5.f, 5.f});
     this->m_mainLayer->addChild(optMenu);
-    
-    // === OPENING ANIMATION WITH RENDER TEXTURE ===
-    // Queue the animation for next frame (after everything is laid out)
-    Loader::get()->queueInMainThread([this]() {
-        if (!this->m_mainLayer) return;
-        
-        auto layerSize = CCDirector::sharedDirector()->getWinSize();
-        float fuck = Mod::get()->getSettingValue<double>("modern-ui-scale");
-        
-        // Create render texture
-        auto renderTex = CCRenderTexture::create(
-            (int)layerSize.width, 
-            (int)layerSize.height,
-            kCCTexture2DPixelFormat_RGBA8888
-        );
-        
-        if (!renderTex) {
-            log::warn("Failed to create render texture for popup animation");
-            return;
-        }
-        
-        // Capture the popup
-        renderTex->begin();
-        this->m_mainLayer->visit();
-        renderTex->end();
-        
-        // Create sprite from the capture
-        m_animSprite = CCSprite::createWithTexture(renderTex->getSprite()->getTexture());
-        m_animSprite->setFlipY(true);  // RenderTexture is flipped
-        m_animSprite->setPosition(this->m_mainLayer->getPosition());
-        m_animSprite->setAnchorPoint(this->m_mainLayer->getAnchorPoint());
-        m_animSprite->setScale(fuck - 0.2f);
-        m_animSprite->setOpacity(0);
-        m_animSprite->setZOrder(this->m_mainLayer->getZOrder());
-        
-        // Hide the real popup
-        this->m_mainLayer->setVisible(false);
-        
-        // Add sprite to same parent as m_mainLayer
-        this->addChild(m_animSprite);
-        
-        // Animate the sprite
-        auto fadeIn = CCEaseExponentialOut::create(CCFadeIn::create(0.28f));
-        auto scaleUp = CCEaseExponentialOut::create(CCScaleTo::create(0.3f, fuck));
-        auto spawn = CCSpawn::create(fadeIn, scaleUp, nullptr);
-        
-        auto showReal = CCCallFunc::create(this, callfunc_selector(ModernSettingsPopup::onAnimationComplete));
-        auto sequence = CCSequence::create(spawn, showReal, nullptr);
-        
-        m_animSprite->runAction(sequence);
-    });
     
     return true;
 }
